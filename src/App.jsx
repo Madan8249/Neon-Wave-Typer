@@ -55,18 +55,10 @@ const generateContent = (mode) => {
     return SENTENCES[Math.floor(Math.random() * SENTENCES.length)];
   } else if (mode === 'numbers') {
     return Math.floor(Math.random() * 10000).toString();
-  } 
-  // --- START: NEW ALPHANUMERIC MODE ---
-  else if (mode === 'alphanumeric') {
-    const chars = "abcdefghijklmnopqrstuvwxyz0123456789";
-    // Sirf ek random character generate karein
-    return chars.charAt(Math.floor(Math.random() * chars.length)); 
-  }
-  // --- END: NEW ALPHANUMERIC MODE ---
-  else if (mode === 'mixed') {
+  } else if (mode === 'mixed') {
     let result = '';
     const length = 5 + Math.floor(Math.random() * 5);
-    const alpha = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    const alpha = "abcdefghijklmnopqrstuvwxyz";
     const nums = "0123456789";
     const all = alpha + nums + SPECIAL_CHARS;
     
@@ -78,6 +70,9 @@ const generateContent = (mode) => {
       result += all.charAt(Math.floor(Math.random() * all.length));
     }
     return result.split('').sort(() => 0.5 - Math.random()).join('');
+  } else if (mode === 'alphanumeric') { // AlphNumeric mode added for capital letters
+    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"; 
+    return chars.charAt(Math.floor(Math.random() * chars.length)); 
   }
   return "error";
 };
@@ -260,7 +255,7 @@ export default function NeonWaveTyper() {
     }
 
     if (inputValue.length > 0 && !inputError) {
-      const matchingDrop = drops.find(d => d.text.startsWith(inputValue));
+      const matchingDrop = drops.find(d => d.text.toLowerCase().startsWith(inputValue.toLowerCase()));
       if (matchingDrop) {
         const char = matchingDrop.text[inputValue.length];
         setNextChar(char);
@@ -284,9 +279,7 @@ export default function NeonWaveTyper() {
     let baseRate = 1600; 
     if (mode === 'sentences') baseRate = 3000; 
     if (mode === 'mixed') baseRate = 2000;
-    // --- START: NEW ALPHANUMERIC SETTING ---
-    if (mode === 'alphanumeric') baseRate = 800; // Single character, fast spawn
-    // --- END: NEW ALPHANUMERIC SETTING ---
+    if (mode === 'alphanumeric') baseRate = 1200; // Faster spawn for single char
     
     // --- SCALING LOGIC ---
     let rateFactor = 1;
@@ -306,9 +299,7 @@ export default function NeonWaveTyper() {
   const getFallSpeed = () => {
     let baseSpeed = 0.7; 
     if (mode === 'sentences') baseSpeed = 0.4; 
-    // --- START: NEW ALPHANUMERIC SETTING ---
-    if (mode === 'alphanumeric') baseSpeed = 1.0; // Single character, fast fall
-    // --- END: NEW ALPHANUMERIC SETTING ---
+    if (mode === 'alphanumeric') baseSpeed = 0.8; // Faster drop for single char
     
     // --- SCALING LOGIC ---
     let speedFactor = 1;
@@ -436,7 +427,7 @@ export default function NeonWaveTyper() {
     });
   };
 
-  // --- Control Functions (omitted for brevity) ---
+  // --- Control Functions ---
   const handleInputChange = (e) => {
     if (gameState !== 'playing' || isPaused) return;
     const val = e.target.value;
@@ -447,12 +438,12 @@ export default function NeonWaveTyper() {
       return;
     }
 
-    // ✅ FIX 1: Case-insensitive startsWith check
+    // FIX 1: Case-insensitive matching ke liye
     const matchingDrop = drops.find(drop => drop.text.toLowerCase().startsWith(val.toLowerCase()));
 
     if (matchingDrop) {
       setInputError(false);
-      // ✅ FIX 2: Case-insensitive full match check
+      // FIX 2: Case-insensitive full match check
       if (val.toLowerCase() === matchingDrop.text.toLowerCase()) { 
         setScore(s => s + (matchingDrop.text.length * 10));
         totalCharsTypedRef.current += matchingDrop.text.length;
@@ -463,6 +454,7 @@ export default function NeonWaveTyper() {
       setInputError(true);
     }
   };
+
   const startGame = () => {
     setDrops([]);
     setScore(0);
@@ -563,13 +555,15 @@ export default function NeonWaveTyper() {
              
              <div className="text-center px-1 md:px-2 border-l border-gray-700">
                <div className="text-[8px] md:text-[9px] text-gray-500 uppercase">Score</div>
-               <div className="font-bold text-base md:text-lg">{score}</div>
+               {/* SCORE FONT SIZE INCREASED */}
+               <div className="font-bold text-lg md:text-xl">{score}</div>
                {highScore > 0 && highScore > score && <div className="text-[7px] md:text-[8px] text-yellow-400">H: {highScore}</div>}
              </div>
              
              <div className="text-center px-1 md:px-2 border-l border-gray-700">
                <div className="text-[8px] md:text-[9px] text-gray-500 uppercase">WPM</div>
-               <div className="font-bold text-base md:text-lg text-cyan-400">{wpm}</div>
+               {/* WPM FONT SIZE INCREASED */}
+               <div className="font-bold text-lg md:text-xl text-cyan-400">{wpm}</div>
                {highWPM > 0 && highWPM > wpm && <div className="text-[7px] md:text-[8px] text-yellow-400">H: {highWPM}</div>}
              </div>
           </div>
@@ -580,7 +574,7 @@ export default function NeonWaveTyper() {
           
           {/* Mode Tabs */}
           <div className="flex gap-1">
-            {['alphanumeric', 'words', 'sentences', 'numbers', 'mixed'].map(m => (
+            {['words', 'sentences', 'numbers', 'mixed', 'alphanumeric'].map(m => (
               <button key={m} onClick={() => setMode(m)} disabled={gameState === 'playing' && !isPaused} className={getModeTabClass(m)}>{m}</button>
             ))}
           </div>
@@ -705,9 +699,10 @@ export default function NeonWaveTyper() {
            )}
 
           {drops.map(drop => {
-            const isMatched = inputValue.length > 0 && drop.text.startsWith(inputValue);
+            const isMatched = inputValue.length > 0 && drop.text.toLowerCase().startsWith(inputValue.toLowerCase());
             return (
-              <div key={drop.id} className={`className={`absolute px-4 py-2 rounded-full font-mono font-bold text-2xl border flex items-center justify-center whitespace-nowrap ${isMatched ? 'bg-cyan-600 text-white border-cyan-300 z-20 scale-110' : 'bg-gray-800 text-gray-300 border-gray-600 z-10'}`} style={{ left: `${drop.x}%`, top: drop.y, transform: `translate(-50%, 0)` }}>
+              // BUBBLE SIZE INCREASED: px-3 py-1 -> px-4 py-2 | text-lg -> text-2xl
+              <div key={drop.id} className={`absolute px-4 py-2 rounded-full font-mono font-bold text-2xl border flex items-center justify-center whitespace-nowrap ${isMatched ? 'bg-cyan-600 text-white border-cyan-300 z-20 scale-110' : 'bg-gray-800 text-gray-300 border-gray-600 z-10'}`} style={{ left: `${drop.x}%`, top: drop.y, transform: `translate(-50%, 0)` }}>
                 <span className="relative z-10">{isMatched ? <><span className="text-yellow-300">{inputValue}</span><span>{drop.text.substring(inputValue.length)}</span></> : drop.text}</span>
               </div>
             );
@@ -731,7 +726,8 @@ export default function NeonWaveTyper() {
               onChange={handleInputChange}
               disabled={gameState !== 'playing' || isPaused}
               placeholder={gameState === 'playing' && !isPaused ? "" : "..."}
-              className={`w-full bg-gray-950 text-xl md:text-2xl font-mono text-center py-3 rounded-xl border-2 outline-none transition-all duration-200 ${inputError ? 'border-red-500 text-red-400' : 'border-cyan-700 text-cyan-400 focus:border-cyan-400'}`}
+              // INPUT FONT SIZE INCREASED: text-xl md:text-2xl -> text-2xl md:text-3xl | py-3 -> py-4
+              className={`w-full bg-gray-950 text-2xl md:text-3xl font-mono text-center py-4 rounded-xl border-2 outline-none transition-all duration-200 ${inputError ? 'border-red-500 text-red-400' : 'border-cyan-700 text-cyan-400 focus:border-cyan-400'}`}
               autoComplete="off" spellCheck="false"
             />
             <div className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-600">
