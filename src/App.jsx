@@ -5,6 +5,9 @@ import html2canvas from 'html2canvas'; // <-- NEW DEPENDENCY IMPORTED HERE
 // --- Data & Generators ---
 
 const WORD_LIST = [
+  "Alfa", "Bravo", "Charlie", "Delta", "Echo", "Foxtrot", "Golf", "Hotel", "India", "Juliett",
+  "Kilo", "lima", "Mike", "November", "Oscar", "Papa", "Quebec", "Romeo", "Sierra", "Tango",
+  "Uniform", "Victor", "Whiskey", "X-ray", "Yankee", "Zulu", "Crash", "Immediate","Most Immediate",
   "react", "component", "hook", "state", "effect", "neon", "cyber", "punk", "logic", "render",
   "browser", "client", "server", "interface", "abstract", "design", "system", "grid", "flex",
   "water", "bubble", "drop", "keyboard", "mouse", "screen", "code", "syntax", "error", "debug",
@@ -23,6 +26,7 @@ const SENTENCES = [
   "Clean code matters",
   "Do not give up",
   "Frontend is fun"
+  "The Quick Brown Fox Jumps Over The Lazy Dog",
 ];
 
 const SPECIAL_CHARS = "!@#$%^&*()_+-=[]{}|;:,.<>?";
