@@ -12,7 +12,7 @@ const WORD_LIST = [
   "browser", "client", "server", "interface", "abstract", "design", "system", "grid", "flex",
   "water", "bubble", "drop", "keyboard", "mouse", "screen", "code", "syntax", "error", "debug",
   "future", "light", "dark", "mode", "switch", "toggle", "input", "output", "stream", "data",
-  "algorithm", "binary", "pixel", "vector", "matrix", "terminal", "script", "compile"
+  "algorithm", "binary", "pixel", "vector", "matrix", "terminal", "script", "compile",
 ];
 
 const SENTENCES = [
@@ -25,8 +25,7 @@ const SENTENCES = [
   "Hello world again",
   "Clean code matters",
   "Do not give up",
-  "Frontend is fun"
-  "The Quick Brown Fox Jumps Over The Lazy Dog",
+  "Frontend is fun",
 ];
 
 const SPECIAL_CHARS = "!@#$%^&*()_+-=[]{}|;:,.<>?";
